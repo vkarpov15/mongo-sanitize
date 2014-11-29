@@ -16,7 +16,7 @@
   ],
   "devDependencies": {
     "body-parser": "1.6.5",
-    "express": "4.8.5",
+    "express": "4.10.4",
     "mocha": "1.21.4",
     "request": "2.40.0"
   },

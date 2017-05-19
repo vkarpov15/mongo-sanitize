@@ -15,3 +15,5 @@ Users.findOne({ name: clean }, function(err, doc) {
   // ...
 });
 ```
+
+If `sanitize()` is passed an object, it will mutate the original object.

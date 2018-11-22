@@ -22,5 +22,8 @@
     "request": "2.40.0"
   },
   "author": "Valeri Karpov",
-  "license": "MIT"
+  "license": "MIT",
+  "repository": {
+    "url": "https://github.com/vkarpov15/mongo-sanitize"
+  }
 }

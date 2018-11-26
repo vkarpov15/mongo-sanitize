@@ -1,7 +1,7 @@
 var sanitize = require('./index.js');
 var assert = require('assert');
 var express = require('express');
-var request = require('request');
+var superagent = require('superagent');
 
 describe('sanitize', function() {
   it('should remove fields that start with $ from objects', function() {
@@ -56,7 +56,7 @@ describe('sanitize express integration', function() {
       done();
     });
 
-    request.get('http://localhost:8081/test?username[$gt]=', function(){});
+    superagent.get('http://localhost:8081/test?username[$gt]=', function(){});
   });
 
   it('should sensibly sanitize body JSON', function(done) {
@@ -71,14 +71,9 @@ describe('sanitize express integration', function() {
       done();
     });
 
-    request.post(
-      {
-        url: 'http://localhost:8081/test',
-        form: {
-          username: { $gt: "", a: 1 },
-          arr: [1, 2, 3]
-        }
-      },
-      function(){});
+    superagent.post('http://localhost:8081/test').send({
+      username: { $gt: "", a: 1 },
+      arr: [1, 2, 3]
+    }).end();
   });
 });

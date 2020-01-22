@@ -5,21 +5,21 @@ var superagent = require('superagent');
 
 describe('sanitize', function() {
   it('should remove fields that start with $ from objects', function() {
-    assert.equal(0, Object.keys(sanitize({ $gt: 5 })).length);
-
-    var o = sanitize({ $gt: 5, a: 1 });
-    assert.equal(1, Object.keys(o).length);
-    assert.equal('a', Object.keys(o)[0]);
-    assert.equal(1, o.a);
+    // { $gt: 5 } -> {}
+    assert.equal(Object.keys(sanitize({ $gt: 5 })).length, 0);
+    // { $gt: 5, a: 1 } -> { a: 1 }
+    assert.deepEqual(sanitize({ $gt: 5, a: 1 }), { a: 1 });
+    // { $gt: '' } -> {}
+    assert.deepEqual(sanitize({ '$gt': '' }), {});
   });
 
   it('should do nothing for numbers and strings', function() {
-    assert.equal(1, sanitize(1));
-    assert.equal('a', sanitize('a'));
+    assert.equal(sanitize(1), 1);
+    assert.equal(sanitize('a'), 'a');
   });
 
   it('should do nothing for arrays', function() {
-    assert.deepEqual([1, 2, 3], sanitize([1, 2, 3]));
+    assert.deepEqual(sanitize([1, 2, 3]), [1, 2, 3]);
   });
 
   it('shouldnt be fooled by non-POJOs', function() {
@@ -29,9 +29,21 @@ describe('sanitize', function() {
     };
 
     var o = sanitize(new Clazz());
-    assert.equal(1, Object.keys(o).length);
-    assert.equal('a', Object.keys(o)[0]);
-    assert.equal(1, o.a);
+    assert.deepEqual(o, { a: 1 });
+  });
+
+  it('should remove nested fields', function () {
+    var obj = { username: { $ne: null }};
+    assert.deepEqual(sanitize(obj), { username: {} });
+
+    var issue3 = { "foo": { "bar": { "$ref": "foo" } } };
+    assert.deepEqual(sanitize(issue3), { foo: { bar: {} } })
+  });
+
+  it('should do nothing for null or undefined', function () {
+    assert.equal(null, sanitize(null));
+    assert.equal(undefined, sanitize(undefined));
+    assert.deepEqual(sanitize({ 'a': null }), { 'a': null });
   });
 });
 
@@ -52,7 +64,7 @@ describe('sanitize express integration', function() {
 
   it('should sensibly sanitize query params', function(done) {
     app.get('/test', function(req, res) {
-      assert.equal(0, Object.keys(sanitize(req.query.username)).length);
+      assert.equal(Object.keys(sanitize(req.query.username)).length, 0);
       done();
     });
 
@@ -62,12 +74,8 @@ describe('sanitize express integration', function() {
   it('should sensibly sanitize body JSON', function(done) {
     app.post('/test', function(req, res) {
       var clean = sanitize(req.body.username);
-      assert.equal(1, Object.keys(clean).length);
-      assert.equal('a', Object.keys(clean)[0]);
-      assert.equal(1, clean.a);
-
-      assert.deepEqual([1, 2, 3], req.body.arr);
-
+      assert.deepEqual(clean, { 'a': 1 });
+      assert.deepEqual(req.body.arr, [1, 2, 3]);
       done();
     });
 

@@ -33,6 +33,20 @@ describe('sanitize', function() {
     assert.equal('a', Object.keys(o)[0]);
     assert.equal(1, o.a);
   });
+
+  it('should remove nested fields', function () {
+    var obj = { username: { $ne: null }};
+    assert.deepEqual(sanitize(obj), { username: {} });
+
+    var issue3 = { "foo": { "bar": { "$ref": "foo" } } };
+    assert.deepEqual(sanitize(issue3), { foo: { bar: {} } })
+  });
+
+  it('should do nothing for null or undefined', function () {
+    assert.equal(null, sanitize(null));
+    assert.equal(undefined, sanitize(undefined));
+    assert.deepEqual(sanitize({ 'a': null }), { 'a': null });
+  });
 });
 
 describe('sanitize express integration', function() {

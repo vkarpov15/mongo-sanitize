@@ -1,7 +1,7 @@
 mongo-sanitize
 ==============
 
-For the passionately lazy, a standalone module that sanitizes inputs against [query selector injection attacks](http://blog.websecurify.com/2014/08/hacking-nodejs-and-mongodb.html):
+For the passionately lazy, a standalone module that sanitizes inputs against [query selector injection attacks](https://web.archive.org/web/20220301171109/https://blog.websecurify.com/2014/08/hacking-nodejs-and-mongodb.html):
 
 ```
 var sanitize = require('mongo-sanitize');
